@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NKTg Ground Vehicle — Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;600;800&display=swap');
+
+  :root {
+    --bg:     #080c14;
+    --panel:  #0d1520;
+    --border: #1a2f4a;
+    --cyan:   #00e5ff;
+    --green:  #00ff88;
+    --orange: #ff6b00;
+    --red:    #ff2244;
+    --yellow: #ffe600;
+    --text:   #c8dff0;
+    --dim:    #4a6680;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Exo 2', sans-serif;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper { position: relative; z-index: 1; padding: 20px; max-width: 1400px; margin: 0 auto; }
+
+  /* ── Header ── */
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 16px; margin-bottom: 24px;
+  }
+  .logo { display: flex; align-items: center; gap: 12px; }
+  .logo-icon {
+    width: 44px; height: 44px;
+    border: 2px solid var(--cyan); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 0 16px rgba(0,229,255,0.3);
+  }
+  h1 { font-size: 1.4rem; font-weight: 800; letter-spacing: 0.05em; color: #fff; }
+  h1 span { color: var(--cyan); }
+  .subtitle { font-size: 0.72rem; color: var(--dim); font-family: 'Share Tech Mono', monospace; }
+
+  /* ── Status ── */
+  .status-badge {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 16px;
+    border: 1px solid var(--border); border-radius: 20px;
+    font-family: 'Share Tech Mono', monospace; font-size: 0.8rem;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dim); transition: background 0.3s; }
+  .dot.connected { background: var(--green); box-shadow: 0 0 8px var(--green); animation: pulse 1.5s infinite; }
+  .dot.error     { background: var(--red); }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  #connectBtn {
+    background: linear-gradient(135deg, var(--cyan), #0088cc);
+    color: #000; border: none; border-radius: 8px;
+    padding: 10px 20px; font-weight: 700; font-size: 0.9rem;
+    cursor: pointer; font-family: 'Exo 2', sans-serif;
+    transition: all 0.2s; letter-spacing: 0.05em;
+  }
+  #connectBtn:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(0,229,255,0.4); }
+  #connectBtn:disabled { background: var(--dim); color: var(--bg); cursor: not-allowed; transform: none; }
+
+  /* ── Metrics ── */
+  .metrics {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 16px; margin-bottom: 24px;
+  }
+  .metric-card {
+    background: var(--panel);
+    border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px 20px; position: relative; overflow: hidden;
+  }
+  .metric-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: var(--accent, var(--cyan));
+    box-shadow: 0 0 12px var(--accent, var(--cyan));
+  }
+  .metric-label {
+    font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--dim); font-family: 'Share Tech Mono', monospace; margin-bottom: 6px;
+  }
+  .metric-value {
+    font-size: 2rem; font-weight: 800; font-family: 'Share Tech Mono', monospace;
+    color: var(--accent, var(--cyan)); line-height: 1;
+  }
+  .metric-unit { font-size: 0.68rem; color: var(--dim); margin-top: 4px; font-family: 'Share Tech Mono', monospace; }
+
+  /* ── State panel ── */
+  .state-panel {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px 24px; margin-bottom: 24px;
+    display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  }
+  .state-label { font-size: 0.72rem; color: var(--dim); font-family: 'Share Tech Mono', monospace; }
+  .state-value { font-size: 1.5rem; font-weight: 800; letter-spacing: 0.1em; color: var(--green); transition: color 0.3s; }
+  .state-value.warning { color: var(--yellow); text-shadow: 0 0 20px var(--yellow); }
+  .state-value.danger  { color: var(--red);    text-shadow: 0 0 20px var(--red); animation: shake 0.3s; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
+
+  .nktg-values { display: flex; gap: 40px; }
+  .nktg-item { text-align: center; }
+  .nktg-num {
+    font-size: 1.8rem; font-weight: 800; font-family: 'Share Tech Mono', monospace;
+    color: var(--cyan); transition: color 0.3s;
+  }
+  .nktg-num.warn { color: var(--yellow); }
+  .nktg-num.crit { color: var(--red); animation: pulse 0.5s infinite; }
+
+  /* ── Charts ── */
+  .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .chart-card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+  .chart-title {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--dim); font-family: 'Share Tech Mono', monospace; margin-bottom: 12px;
+  }
+  canvas { width: 100% !important; border-radius: 6px; }
+
+  /* ── Log ── */
+  .log-panel { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+  .log-title {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--dim); font-family: 'Share Tech Mono', monospace; margin-bottom: 10px;
+  }
+  #logBox { font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: #7aa0bf; height: 120px; overflow-y: auto; line-height: 1.6; }
+  #logBox .ev  { color: var(--yellow); }
+  #logBox .err { color: var(--red); }
+  #logBox .ok  { color: var(--green); }
+
+  @media (max-width: 800px) {
+    .metrics { grid-template-columns: repeat(2, 1fr); }
+    .charts  { grid-template-columns: 1fr; }
+    .nktg-values { flex-direction: column; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🚗</div>
+      <div>
+        <h1><span>NKTg</span> Ground Vehicle</h1>
+        <div class="subtitle">REAL-TIME MONITORING DASHBOARD — v1.0</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="status-badge">
+        <div class="dot" id="dot"></div>
+        <span id="statusText">DISCONNECTED</span>
+      </div>
+      <button id="connectBtn" onclick="connectSerial()">⚡ Connect ESP32</button>
+    </div>
+  </header>
+
+  <!-- Metrics -->
+  <div class="metrics">
+    <div class="metric-card" style="--accent:#00e5ff">
+      <div class="metric-label">Position x</div>
+      <div class="metric-value" id="valX">—</div>
+      <div class="metric-unit">meters (m)</div>
+    </div>
+    <div class="metric-card" style="--accent:#00ff88">
+      <div class="metric-label">Velocity v</div>
+      <div class="metric-value" id="valV">—</div>
+      <div class="metric-unit">m/s</div>
+    </div>
+    <div class="metric-card" style="--accent:#ffe600">
+      <div class="metric-label">Mass m</div>
+      <div class="metric-value" id="valM">—</div>
+      <div class="metric-unit">kg</div>
+    </div>
+    <div class="metric-card" style="--accent:#ff6b00">
+      <div class="metric-label">Mass rate dm/dt</div>
+      <div class="metric-value" id="valDM">—</div>
+      <div class="metric-unit">kg/s</div>
+    </div>
+  </div>
+
+  <!-- NKTg state -->
+  <div class="state-panel">
+    <div>
+      <div class="state-label">VEHICLE STATE</div>
+      <div class="state-value" id="stateText">NOT CONNECTED</div>
+    </div>
+    <div class="nktg-values">
+      <div class="nktg-item">
+        <div class="metric-label">NKTg_1 = x · (m · v)</div>
+        <div class="nktg-num" id="valN1">—</div>
+      </div>
+      <div class="nktg-item">
+        <div class="metric-label">NKTg_2 = ṁ · (m · v)</div>
+        <div class="nktg-num" id="valN2">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="charts">
+    <div class="chart-card">
+      <div class="chart-title">NKTg_1 — Position energy · · · danger threshold: 500</div>
+      <canvas id="chart1" height="180"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">NKTg_2 — Mass-change energy · · · danger threshold: −50</div>
+      <canvas id="chart2" height="180"></canvas>
+    </div>
+  </div>
+
+  <!-- Log -->
+  <div class="log-panel">
+    <div class="log-title">Event Log</div>
+    <div id="logBox"></div>
+  </div>
+
+</div>
+
+<script>
+// ================================================================
+// NKTg Dashboard — Web Serial API + Canvas charts
+// Chrome / Edge only (Web Serial not supported in Firefox)
+// ================================================================
+
+const DANGER_N1  =  500;
+const DANGER_N2  = -50;
+const MAX_POINTS =  200;
+
+let port, buffer = '';
+let n1History = [], n2History = [];
+let frameCount = 0;
+
+// ── Chart helpers ────────────────────────────────────────────────
+function initChart(id) {
+    const canvas = document.getElementById(id);
+    const ctx    = canvas.getContext('2d');
+    const resize = () => {
+        canvas.width  = canvas.offsetWidth  * devicePixelRatio;
+        canvas.height = canvas.offsetHeight * devicePixelRatio;
+        ctx.scale(devicePixelRatio, devicePixelRatio);
+    };
+    resize();
+    window.addEventListener('resize', resize);
+    return { canvas, ctx };
+}
+
+function drawChart({ canvas, ctx }, data, color, dangerLine) {
+    const W = canvas.offsetWidth, H = canvas.offsetHeight;
+    ctx.clearRect(0, 0, W, H);
+    if (data.length < 2) return;
+
+    const absMax  = Math.max(...data.map(Math.abs), Math.abs(dangerLine), 1);
+    const dataMin = Math.min(...data, dangerLine, -1);
+    const range   = absMax - dataMin || 1;
+    const sy      = v => H - ((v - dataMin) / range) * (H - 20) - 10;
+
+    // Grid
+    ctx.strokeStyle = 'rgba(26,47,74,0.8)';
+    ctx.lineWidth   = 1;
+    for (let i = 0; i <= 4; i++) {
+        const y = 10 + ((H - 20) / 4) * i;
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+
+    // Danger line
+    const dy = sy(dangerLine);
+    if (dy > 0 && dy < H) {
+        ctx.strokeStyle = 'rgba(255,34,68,0.5)';
+        ctx.setLineDash([6, 4]); ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(0, dy); ctx.lineTo(W, dy); ctx.stroke();
+        ctx.setLineDash([]);
+    }
+
+    // Fill
+    const grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, color + '44');
+    grad.addColorStop(1, color + '05');
+    ctx.beginPath();
+    ctx.moveTo(0, sy(data[0]));
+    data.forEach((v, i) => ctx.lineTo((i / (data.length - 1)) * W, sy(v)));
+    ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+    ctx.fillStyle = grad; ctx.fill();
+
+    // Line
+    ctx.beginPath();
+    ctx.strokeStyle = color; ctx.lineWidth = 2;
+    ctx.shadowColor = color; ctx.shadowBlur = 6;
+    data.forEach((v, i) => {
+        const x = (i / (data.length - 1)) * W;
+        i === 0 ? ctx.moveTo(x, sy(v)) : ctx.lineTo(x, sy(v));
+    });
+    ctx.stroke(); ctx.shadowBlur = 0;
+}
+
+const chart1 = initChart('chart1');
+const chart2 = initChart('chart2');
+
+// ── Serial connection ────────────────────────────────────────────
+async function connectSerial() {
+    if (!('serial' in navigator)) {
+        log('Browser does not support Web Serial. Use Chrome or Edge.', 'err');
+        return;
+    }
+    try {
+        port = await navigator.serial.requestPort();
+        await port.open({ baudRate: 115200 });
+        setStatus('connected');
+        log('Connected to ESP32.', 'ok');
+        document.getElementById('connectBtn').disabled = true;
+        readLoop();
+    } catch (e) {
+        log('Connection failed: ' + e.message, 'err');
+        setStatus('error');
+    }
+}
+
+async function readLoop() {
+    const decoder = new TextDecoderStream();
+    port.readable.pipeTo(decoder.writable);
+    const reader = decoder.readable.getReader();
+    try {
+        while (true) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            buffer += value;
+            const lines = buffer.split('\n');
+            buffer = lines.pop();
+            lines.forEach(processLine);
+        }
+    } catch (e) {
+        log('Connection lost: ' + e.message, 'err');
+        setStatus('disconnected');
+        document.getElementById('connectBtn').disabled = false;
+    }
+}
+
+// ── Data processing ──────────────────────────────────────────────
+function processLine(line) {
+    line = line.trim();
+    if (!line) return;
+
+    if (line === 'READY') {
+        log('ESP32 ready — NKTg control loop running at 100 Hz.', 'ok');
+        return;
+    }
+
+    const parts = line.split(',');
+    if (parts.length !== 4) return;
+
+    const [x, v, m, dm] = parts.map(Number);
+    if (parts.some(p => isNaN(Number(p)))) return;
+
+    const n1 = x  * (m * v);
+    const n2 = dm * (m * v);
+
+    // Update metric displays
+    document.getElementById('valX').textContent  = x.toFixed(3);
+    document.getElementById('valV').textContent  = v.toFixed(3);
+    document.getElementById('valM').textContent  = m.toFixed(3);
+    document.getElementById('valDM').textContent = dm.toFixed(4);
+    document.getElementById('valN1').textContent = n1.toFixed(2);
+    document.getElementById('valN2').textContent = n2.toFixed(2);
+
+    // NKTg color coding
+    const n1El  = document.getElementById('valN1');
+    const n2El  = document.getElementById('valN2');
+    const stEl  = document.getElementById('stateText');
+
+    n1El.className = 'nktg-num' + (n1 > DANGER_N1 ? ' crit' : n1 > DANGER_N1 * 0.7 ? ' warn' : '');
+    n2El.className = 'nktg-num' + (n2 < DANGER_N2 ? ' crit' : n2 < DANGER_N2 * 0.7 ? ' warn' : '');
+
+    if (n1 > DANGER_N1) {
+        stEl.textContent  = '🛑 EMERGENCY BRAKE';
+        stEl.className    = 'state-value danger';
+        log(`EMERGENCY STOP — NKTg_1 = ${n1.toFixed(1)} (threshold ${DANGER_N1})`, 'err');
+    } else if (n2 < DANGER_N2) {
+        stEl.textContent  = '⚠️ REDUCING SPEED';
+        stEl.className    = 'state-value warning';
+        log(`REDUCE SPEED — NKTg_2 = ${n2.toFixed(1)} (threshold ${DANGER_N2})`, 'ev');
+    } else {
+        stEl.textContent  = '✅ NORMAL';
+        stEl.className    = 'state-value';
+    }
+
+    // Update chart data
+    n1History.push(n1); n2History.push(n2);
+    if (n1History.length > MAX_POINTS) { n1History.shift(); n2History.shift(); }
+
+    // Redraw every 2 frames to reduce CPU load
+    frameCount++;
+    if (frameCount % 2 === 0) {
+        drawChart(chart1, n1History, '#00e5ff', DANGER_N1);
+        drawChart(chart2, n2History, '#ff6b00', DANGER_N2);
+    }
+}
+
+// ── Utilities ────────────────────────────────────────────────────
+function setStatus(s) {
+    document.getElementById('dot').className       = 'dot ' + (s === 'connected' ? 'connected' : s === 'error' ? 'error' : '');
+    document.getElementById('statusText').textContent = s === 'connected' ? 'CONNECTED' : s === 'error' ? 'ERROR' : 'DISCONNECTED';
+}
+
+function log(msg, cls = '') {
+    const box  = document.getElementById('logBox');
+    const line = document.createElement('div');
+    if (cls) line.className = cls;
+    line.textContent = `[${new Date().toLocaleTimeString('en-US')}] ${msg}`;
+    box.appendChild(line);
+    box.scrollTop = box.scrollHeight;
+    while (box.children.length > 80) box.removeChild(box.firstChild);
+}
+
+log('Dashboard ready. Click "Connect ESP32" to start.');
+</script>
+</body>
+</html>
