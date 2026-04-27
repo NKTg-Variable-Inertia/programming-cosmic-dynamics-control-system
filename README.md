@@ -177,13 +177,8 @@ From Python to Assembly. From AI to Quantum Computing. One law. One engine. Infi
 ## 🌐 Explore the Physics Deeper
 
 To explore the physical foundations behind NKTg Law in depth, you can visit:
+
 👉 **[traiphieu.com](https://traiphieu.com)**
-
----
-
-## 🔗 Distributed Repository Presence
-
-Through this distributed presence, the NKTg Law operates not merely as software, but as a persistent, verifiable, and universally accessible system of computational physics — capable of existing, executing, and being validated anywhere in the world, independent of centralized control.
 
 | Platform | Link |
 |----------|------|
