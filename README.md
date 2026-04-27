@@ -1,3 +1,4 @@
+> **Note on Origin:** This project is a direct implementation excerpt from the book **"Programming Cosmic Dynamics"**. While this repository focuses on the ESP32 Autonomous Vehicle, the complete mathematical framework, ESA-validated datasets, and dozens of other cross-platform applications (ranging from Assembly to Quantum Computing) are detailed in the full publication.
 # NKTg Ground Vehicle
 A real-time robot vehicle controlled entirely by NKTg (mass-kinetic energy function) — physical sensors feed actual x, v, m, dm/dt data into the NKTg engine running at 100 Hz on an ESP32, which issues motor commands in real time.
 
