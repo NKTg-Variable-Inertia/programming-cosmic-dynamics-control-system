@@ -173,7 +173,6 @@ From Python to Assembly. From AI to Quantum Computing. One law. One engine. Infi
 > This is the shift. Not better formulas. Not faster simulations. A new way to build reality in code.
 
 ---
----
 
 ## 🌐 NKTg Autonomous Vehicle Ecosystem: Physics & Distributed Control
 
