@@ -79,8 +79,8 @@ nktg-ground-vehicle/
 ├── validation/
 │   └── real_test.md               # Real hardware test results
 └── NEXT_APPLICATIONS.md
+```
 
----
 ## Operating Layers
 
 | Layer | Rate | Task |
