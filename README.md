@@ -178,10 +178,9 @@ From Python to Assembly. From AI to Quantum Computing. One law. One engine. Infi
 
 To explore the physical foundations behind NKTg Law in depth, you can visit:
 
-👉 **[traiphieu.com](https://traiphieu.com)**
-
 | Platform | Link |
 |----------|------|
+| traiphieu.com | https://traiphieu.com |
 | GitHub | https://github.com/NKTgLaw/NKTgLaw |
 | GitLab | https://gitlab.com/NKTgLaw/NKTgLaw |
 | Gitea | https://gitea.com/NKTgLaw/NKTgLaw |
