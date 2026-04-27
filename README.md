@@ -184,7 +184,7 @@ This project is globally verifiable and accessible. Through this distributed pre
 
 ### 🔗 Distributed Repository Presence
 
-| # | Platform | Official Repository Link |
+|   | Platform | Official Repository Link |
 | :-- | :--- | :--- |
 | 1 | **GitLab** | [gitlab.com/.../real-time-control](https://gitlab.com/NKTg-Variable-Inertia/programming-cosmic-dynamics-real-time-control) |
 | 2 | **GitHub** | [github.com/.../control-system](https://github.com/NKTg-Variable-Inertia/programming-cosmic-dynamics-control-system) |
