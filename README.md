@@ -59,8 +59,9 @@ Default thresholds (tunable in `Config.h`):
 | NKTg_2 < -50 | Reduce speed 50% |
 | Otherwise | Normal operation |
 
+### Repository Layout
+```text
 nktg-ground-vehicle/
-
 ├── README.md
 ├── build/
 │   └── build_guide.md             # Step-by-step assembly guide
@@ -78,7 +79,6 @@ nktg-ground-vehicle/
 ├── validation/
 │   └── real_test.md               # Real hardware test results
 └── NEXT_APPLICATIONS.md
-
 
 ## Operating Layers
 
