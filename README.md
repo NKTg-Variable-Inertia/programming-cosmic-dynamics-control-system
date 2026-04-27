@@ -59,21 +59,25 @@ Default thresholds (tunable in `Config.h`):
 | NKTg_2 < -50 | Reduce speed 50% |
 | Otherwise | Normal operation |
 
-## Repository Layout
 nktg-ground-vehicle/
 ├── README.md
-├── build/build_guide.md              # Step-by-step assembly guide
-├── firmware/NKTg_ESP32_Controller/   # ESP32 firmware
-│   ├── NKTg_ESP32_Controller.ino
-│   ├── NKTg_Engine.h                 # Core NKTg math
-│   ├── Sensors.h                     # MPU6050 + HX711 + Encoder
-│   ├── MotorControl.h                # BTS7960 driver
-│   └── Config.h                      # All tunable constants
-├── hardware/                         # BOM and wiring diagram
-├── web/NKTg_System.html              # Real-time dashboard (Web Serial)
-├── system/                           # Architecture and data flow docs
-├── validation/real_test.md           # Real hardware test results
+├── build/
+│   └── build_guide.md             # Step-by-step assembly guide
+├── firmware/
+│   └── NKTg_ESP32_Controller/     # ESP32 firmware
+│       ├── NKTg_ESP32_Controller.ino
+│       ├── NKTg_Engine.h          # Core NKTg math
+│       ├── Sensors.h              # MPU6050 + HX711 + Encoder
+│       ├── MotorControl.h         # BTS7960 driver
+│       └── Config.h               # All tunable constants
+├── hardware/                      # BOM and wiring diagram
+├── web/
+│   └── NKTg_System.html           # Real-time dashboard (Web Serial)
+├── system/                        # Architecture and data flow docs
+├── validation/
+│   └── real_test.md               # Real hardware test results
 └── NEXT_APPLICATIONS.md
+
 
 ## Operating Layers
 
